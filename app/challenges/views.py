@@ -371,7 +371,7 @@ def end_ctf(request):
 @require_http_methods(["POST"])
 def bulk_update(request: HttpRequest):
     try:
-        challenges_data = json.loads(request.body)
+        challenges_data = json.loads(request.body.decode())
         challenges = challenges_data["challenges"]
     except Exception:
         logger.exception("Couldn't load json")
@@ -453,7 +453,7 @@ def bulk_update(request: HttpRequest):
 def push_challenges_status(request: HttpRequest):
     # $ curl http://127.0.0.1:8000/challenges/statuses/ -u adminctf -d '{"chal-slug1": true, "chal-slug2": false}'
     try:
-        challenge_states = json.loads(request.body)
+        challenge_states = json.loads(request.body.decode())
     except Exception:
         logger.exception("Couldn't load json")
         return JsonResponse({"message": "Couldn't load json data"}, status=400)
