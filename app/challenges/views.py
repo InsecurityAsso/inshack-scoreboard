@@ -390,6 +390,18 @@ def bulk_update(request: HttpRequest):
     except (KeyError, AssertionError):
         return JsonResponse({"message": "`slug` should be present and unique in all challenges"}, status=400)
 
+    expected_data = """Challenges should be of this form (following documentation may not be up to date): {
+              "difficulty": 0-4 (0 easier, 4 harder),
+              "name": "bla bla" (len<50),
+              "slug": "bla-bla" (extracted from name, identifies the challenge),
+              "description": "Fun story in html",
+              "category": Any of: "MIC", "WEB", "PPC", "FOR", "REV", "PWN", "CRY", "NET",
+              "flag": "INSA{the flag}" (len<=255),
+              "static_url": null OR "url of the static files for the chal",
+              "company_logo_url": null OR "the URL of the company who wrote the chal, if any",
+              "nb_points_override": integer, if greater then -3, it will override the automagic points calculus 
+            }"""
+
     for chal in challenges:
         try:
             difficulty = chal["difficulty"]
@@ -403,44 +415,37 @@ def bulk_update(request: HttpRequest):
             nb_points_override = chal["nb_points_override"]
         except KeyError:
             logger.exception("Wrong challenge format")
-            return JsonResponse({"message": """Challenges should be of this form (following documentation may not be up to date): {
-              "difficulty": 0-4 (0 easier, 4 harder),
-              "name": "bla bla" (len<50),
-              "slug": "bla-bla" (extracted from name, identifies the challenge),
-              "description": "Fun story in html",
-              "category": Any of: "MIC", "WEB", "PPC", "FOR", "REV", "PWN", "CRY", "NET",
-              "flag": "INSA{the flag}" (len<=255),
-              "static_url": null OR "url of the static files for the chal",
-              "company_logo_url": null OR "the URL of the company who wrote the chal, if any",
-              "nb_points_override": integer, if greater then -3, it will override the automagic points calculus 
-            }"""}, status=400)
+            return JsonResponse({"message": expected_data}, status=400)
 
         try:
-            chal = Challenge.all_objects.get(slug=slug)
-            chal.difficulty = difficulty
-            chal.name = name
-            chal.description = description
-            chal.category = category
-            chal.flag = flag
-            chal.static_url = static_url
-            chal.company_logo_url = company_logo_url
-            chal.nb_points_override = nb_points_override
-            chal.full_clean()
-            chal.save()
-        except ObjectDoesNotExist:
-            chal = Challenge(difficulty=difficulty, name=name, description=description, category=category, flag=flag,
-                             static_url=static_url, company_logo_url=company_logo_url,
-                             nb_points_override=nb_points_override)
-            chal.full_clean()
-            chal.save()
+            try:
+                chal = Challenge.all_objects.get(slug=slug)
+                chal.difficulty = difficulty
+                chal.name = name
+                chal.description = description
+                chal.category = category
+                chal.flag = flag
+                chal.static_url = static_url
+                chal.company_logo_url = company_logo_url
+                chal.nb_points_override = nb_points_override
+                chal.full_clean()
+                chal.save()
+            except ObjectDoesNotExist:
+                chal = Challenge(difficulty=difficulty, name=name, slug=slug, description=description, category=category, flag=flag,
+                                 static_url=static_url, company_logo_url=company_logo_url,
+                                 nb_points_override=nb_points_override)
+                chal.full_clean()
+                chal.save()
         except ValidationError as e:
             logger.exception("Wrong challenge format")
-            return JsonResponse({"message": "Challenge `{}` doesn't have the right form: {}".format(name, e)},
-                                status=400)
+            return JsonResponse(
+                    {"message": "Challenge `{}` doesn't have the right form: {}.\n{}".format(name, e, expected_data)},
+                    status=400)
         except Exception:
             logger.exception("Exception creating the challenge")
-            return JsonResponse({"message": "Error while updating {}, please check the server logs".format(name)},
-                                status=500)
+            return JsonResponse(
+                    {"message": "Error while updating {}, please check the serverlogs.\nFor reference: {}".format(name, expected_data)},
+                    status=500)
 
     Challenge.all_objects.exclude(slug__in=challenge_slugs).delete()
     return JsonResponse({"message": "OK"}, status=200)
