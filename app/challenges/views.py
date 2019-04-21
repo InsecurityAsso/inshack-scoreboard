@@ -411,7 +411,7 @@ def bulk_update(request: HttpRequest):
             slug = chal["slug"]
             description = chal["description"]
             category = chal["category"]
-            flag = chal["flag"]
+            flag = sha256(chal["flag"].encode('utf-8')).hexdigest()
             static_url = chal["static_url"]
             company_logo_url = chal["company_logo_url"]
             nb_points_override = chal["nb_points_override"]
