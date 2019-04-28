@@ -160,12 +160,6 @@
                                                 <p>
                                                     {{ chall.description|safe }}
                                                 </p>
-                                                {% if chall.static_url %}
-                                                    <a href="{{ chall.static_url }}"
-                                                       class="btn btn-sm btn-blue-grey" target="_blank" download><i
-                                                            class="fa fa-file-archive-o"></i>&nbsp;&nbsp;&nbsp;&nbsp;Challenge's
-                                                        file</a>
-                                                {% endif %}
                                             </div>
                                             <br>
                                             <form id="chall_{{ chall.id }}" class="flag_form">
