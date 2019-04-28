@@ -20,6 +20,7 @@ from django.views.decorators.csrf import csrf_exempt
 from inshack_scoreboard import settings
 
 from user_manager.forms import UserForm, TeamProfileForm, LoginForm
+from user_manager.models import Ssh
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -170,7 +171,7 @@ def profile(request: HttpRequest) -> HttpResponse:
         if points_to_get != 0:
             percentage_valitated_challs = int(100 * (team_score / points_to_get))
         # Deactivate feature as it's not used for now
-        sshs_set = []  # Ssh.objects.filter(id_team_profile=team_profile.pk).all()
+        ssh = Ssh.objects.filter(id_team_profile=team_profile.pk).first()
 
     if request.method == "POST":
         team_form = UserForm(request.POST, instance=team)

@@ -45,5 +45,5 @@ class TeamProfile(models.Model):
 
 
 class Ssh(models.Model):
-    password = models.CharField(max_length=255)
+    key = models.TextField()
     id_team_profile = models.IntegerField()

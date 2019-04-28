@@ -51,18 +51,30 @@
             </div>
         </div>
 
-        {% if sshs_set is defined and sshs_set %}
-        <div class="row" style="margin-top: 20px">
-            <div class="col">
-                <div class="card card-block">
-                    {% for ssh in sshs_set %}
-                    <h2>SSH infos:</h2>
-                    Login: user{{ team_profile.pk }} <br>
-                    Password: {{ ssh.password }}
-                    {% endfor %}
+        {% if ssh and ctf_has_been_started %}
+            <div class="row" style="margin-top: 20px">
+                <div class="col">
+                    <div class="card card-block">
+                        <h2>SSH infos:</h2>
+                        <p>
+                            Use this private key to connect to challenges using SSH. <br>
+                            <b>Login:</b> <code>user</code> <br>
+                            <b>Private Key:</b> <br>
+                            <pre style="background-color: #F1F1F1; padding: 20px;">{{ ssh.key }}</pre>
+                        </p>
+                        <h3>Tips</h3>
+                        <p>
+                            Here are some tips for people not familiar with SSH<br>
+                            $ <code>mkdir -p ~/.ssh/</code><br>
+                            $ <code>touch ~/.ssh/id_inshack # copy your private key here</code><br>
+                            $ <code>chmod 600 ~/.ssh/id_inshack</code><br>
+                            $ <code>ssh -p $PORT -i ~/.ssh/id_inshack user@${CHAL}.ctf.insecurity-insa.fr</code><br>
+                            You can also pass inputs directly to ssh:<br>
+                            $ <code>cat payload | ssh -p $PORT -i ~/.ssh/id_inshack user@${CHAL}.ctf.insecurity-insa.fr</code>
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
         {% endif %}
 
         <div class="row" style="margin-top: 20px">
