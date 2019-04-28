@@ -26,7 +26,7 @@ class CTFSettings(models.Model):
 
     local_scoreboard_saved = models.TextField(blank=True, null=True)
     global_scoreboard_saved = models.TextField(blank=True, null=True)
-    challenges_states_json = models.TextField(blank=True, null=True)
+    challenges_states_json = models.TextField(blank=True, null=True, default="{}")
     challenges_states_updated_at = models.DateTimeField(default=timezone.now)
 
     @property
